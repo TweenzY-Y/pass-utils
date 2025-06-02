@@ -12,13 +12,17 @@ function randomBytes(size) {
   return arr;
 }
 
+function validateInput(value, name) {
+  if (typeof value !== "number") {
+    throw new TypeError(`${name} must be a number`);
+  }
+  if (value <= 0) {
+    throw new RangeError(`${name} must be greater than 0`);
+  }
+}
+
 function generatePassword(length, options = {}) {
-  if (typeof length !== "number") {
-    throw new TypeError("Password length must be a positive number");
-  }
-  if (length <= 0) {
-    throw new RangeError("Password length must be greater than 0");
-  }
+  validateInput(length, "Password length");
   const {
     uppercase: useUpper = true,
     lowercase: useLower = true,
@@ -50,8 +54,20 @@ function generatePassword(length, options = {}) {
   let password = "";
   const bytes = randomBytes(length);
 
-  for (let index = 0; index < length; index++) {
-    password += possibleCharacters[bytes[index] % possibleCharacters.length];
+  for (let i = 0; i < length; i++) {
+    password += possibleCharacters[bytes[i] % possibleCharacters.length];
   }
   return password;
 }
+
+function generateMultiplePasswords(amount, length, options = {}) {
+  validateInput(length, "Password length");
+  validateInput(amount, "Amount of passwords");
+  const passwordArray = [];
+  for (let i = 0; i < amount; i++) {
+    passwordArray.push(generatePassword(length, options));
+  }
+  return passwordArray;
+}
+
+module.exports = { generatePassword, generateMultiplePasswords };
